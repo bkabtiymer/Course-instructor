@@ -6,11 +6,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.jws.WebParam;
 import javax.validation.Valid;
 
 @Controller
 public class HomeController {
+
+  @Autowired
+  UserRepository userRepository;
 
   @Autowired
   CourseRepository courseRepository;
@@ -32,6 +34,7 @@ public class HomeController {
     }
 
     else {
+      user.setEnabled(true);
       userService.saveUser(user);
       model.addAttribute("message", "User Account Created");
     }
@@ -44,47 +47,91 @@ public class HomeController {
   }
 
   @RequestMapping("/")
-  public String listCourses(Model model){
-    model.addAttribute("courses", courseRepository.findAll());
+  public String listUser(Model model){
+    model.addAttribute("users", userRepository.findAll());
     if(userService.getUser() != null) {
       model.addAttribute("user_id", userService.getUser().getId());
     }
-    return "list";
+    return "userlist";
   }
 
-  @GetMapping("/add")
-  public String courseForm(Model model) {
-    model.addAttribute("course", new Course());
-    return "courseform";
+
+  @GetMapping("/adduser")
+  public String UserForm(Model model) {
+    model.addAttribute("users",userRepository.findAll());
+    model.addAttribute("user", new User());
+    return "userform";
   }
 
-  @PostMapping("/process")
-  public String processForm(@Valid Course course, BindingResult result){
+  @PostMapping("/processuser")
+  public String processForm(@Valid User user, BindingResult result, Model model){
     if(result.hasErrors()){
-      return "courseform";
+      model.addAttribute("users", userRepository.findAll());
+      return "userform";
     }
 
-    course.setUser(userService.getUser());
-    courseRepository.save(course);
+//    course.setUser(userService.getUser());
+    userRepository.save(user);
     return "redirect:/";
   }
 
   @RequestMapping("/detail/{id}")
-  public String showCourse(@PathVariable("id") long id, Model model){
-    model.addAttribute("course", courseRepository.findById(id).get());
-    return "show";
+  public String showUser(@PathVariable("id") long id, Model model){
+    model.addAttribute("user", userRepository.findById(id).get());
+    return "courselist";
   }
 
   @RequestMapping("/update/{id}")
-  public String updateCourse(@PathVariable("id") long id, Model model){
-    model.addAttribute("course", courseRepository.findById(id).get());
-    return "courseform";
+  public String updateUser(@PathVariable("id") long id, Model model){
+    model.addAttribute("courses", courseRepository.findAll());
+            model.addAttribute("user",userRepository.findById(id).get());
+    return "userform";
   }
 
   @RequestMapping("/delete/{id}")
-  public String delCourse(@PathVariable("id") long id){
+  public String delUser(@PathVariable("id") long id){
+    userRepository.deleteById(id);
+    return "redirect:/";
+  }
+//Refering to course
+  @RequestMapping("/addcourse/{id}")
+  public String addCourse(@PathVariable("id") long id, Model model) {
+    model.addAttribute("course", courseRepository.findById(id).get());
+
+    return "redirect:/addcourses";
+  }
+  @GetMapping("/addcourses")
+  public String employeeForm(Model model) {
+    model.addAttribute("course", courseRepository.findAll());
+    model.addAttribute("course", new Course());
+
+    return "courseform";
+  }
+  @PostMapping("/processcourse")
+  public String processForm(@Valid Course course, BindingResult result) {
+    if (result.hasErrors()) {
+      return "courseform";
+    }
+
+    courseRepository.save(course);
+    return "redirect:/";
+  }
+  @RequestMapping("/detail/course/{id}")
+  public String showcourse(@PathVariable("id") long id, Model model){
+//    model.addAttribute("user", userRepository.findAll());
+    model.addAttribute("course", courseRepository.findById(id).get());
+
+    return "courselist";
+  }
+  @RequestMapping("/update/course{id}")
+  public String updatecourse(@PathVariable("id") long id, Model model){
+    model.addAttribute("course", courseRepository.findById(id).get());
+    return "courseform";
+
+  }
+  @RequestMapping("/delete/course{id}")
+  public  String delcourse(@PathVariable("id") long id){
     courseRepository.deleteById(id);
     return "redirect:/";
   }
-
 }
