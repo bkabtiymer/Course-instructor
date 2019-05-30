@@ -38,10 +38,21 @@
 
             <td>
                 <div >
-                    <a th:href="@{/update/{id}(id=${user.id})}" class="btn btn-outline-secondary">Update</a>
-                    <a th:href="@{/detail/{id}(id=${user.id})}" class="btn btn-outline-secondary">Details</a>
+
+                    <div sec:authorize="hasAuthority('ADMIN')">
+
                     <a th:href="@{/delete/{id}(id=${user.id})}" class="btn btn-outline-danger">Delete</a>
                     <a th:href="@{/addcourses}" class="btn btn-outline-secondary">Add Course</a>
+                    <a th:href="@{/update/{id}(id=${user.id})}" class="btn btn-outline-secondary">Update</a>
+                    <a th:href="@{/detail/{id}(id=${user.id})}" class="btn btn-outline-secondary">Details</a>
+
+
+                    </div>
+                        <div sec:authorize="hasAuthority('USER')">
+                            <a th:href="@{/update/{id}(id=${user.id})}" class="btn btn-outline-secondary">Update</a>
+                            <a th:href="@{/detail/{id}(id=${user.id})}" class="btn btn-outline-secondary">Details</a>
+                        </div>
+
                 </div>
             </td>
         </tr>
@@ -49,6 +60,6 @@
         </tbody>
     </table>
 
-
+</div>
 </body>
 </html>
